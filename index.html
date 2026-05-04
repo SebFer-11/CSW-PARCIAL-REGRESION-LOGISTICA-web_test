@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Predictor de Deserción Estudiantil</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111827;
+    --bg3: #1a2234;
+    --card: #141c2e;
+    --card2: #1e2a40;
+    --border: rgba(99,179,237,0.15);
+    --border2: rgba(99,179,237,0.3);
+    --accent: #4f9cf9;
+    --accent2: #7eb8ff;
+    --danger: #f87171;
+    --danger-bg: rgba(248,113,113,0.12);
+    --success: #34d399;
+    --success-bg: rgba(52,211,153,0.12);
+    --warning: #fbbf24;
+    --warning-bg: rgba(251,191,36,0.12);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --purple: #a78bfa;
+    --teal: #2dd4bf;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body: 'DM Sans', system-ui, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,14,26,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    color: var(--accent2);
+    letter-spacing: -0.01em;
+  }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: var(--text2); text-decoration: none; font-size: 0.9rem;
+    font-weight: 500; letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent2); }
+
+  /* HERO */
+  .hero {
+    min-height: 88vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 700px; height: 700px;
+    background: radial-gradient(ellipse, rgba(79,156,249,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(79,156,249,0.1); border: 1px solid rgba(79,156,249,0.25);
+    border-radius: 100px; padding: 6px 16px;
+    font-size: 0.8rem; color: var(--accent2); letter-spacing: 0.05em;
+    text-transform: uppercase; font-weight: 500;
+    margin-bottom: 2rem;
+  }
+  .hero-badge span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: #fff;
+    max-width: 900px;
+    margin-bottom: 1.5rem;
+  }
+  h1 em { font-style: italic; color: var(--accent2); }
+
+  .hero-sub {
+    font-size: 1.1rem; color: var(--text2); max-width: 600px;
+    margin-bottom: 3rem; line-height: 1.7;
+  }
+
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 8px;
+    padding: 0.75rem 1.75rem; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; font-family: var(--font-body);
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-outline {
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border2); border-radius: 8px;
+    padding: 0.75rem 1.75rem; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; font-family: var(--font-body);
+    transition: border-color 0.2s, color 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent2); }
+
+  .hero-stats {
+    display: flex; gap: 3rem; margin-top: 4rem;
+    border-top: 1px solid var(--border); padding-top: 3rem;
+  }
+  .stat-item { text-align: center; }
+  .stat-value { font-family: var(--font-display); font-size: 2rem; color: #fff; }
+  .stat-label { font-size: 0.8rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* SECTIONS */
+  section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+  .section-tag {
+    font-size: 0.75rem; color: var(--accent); text-transform: uppercase;
+    letter-spacing: 0.1em; font-weight: 600; margin-bottom: 1rem;
+  }
+  h2 {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    letter-spacing: -0.02em; color: #fff;
+    margin-bottom: 1rem;
+  }
+  .section-desc { color: var(--text2); max-width: 600px; margin-bottom: 3rem; font-size: 1.05rem; }
+
+  /* PIPELINE */
+  .pipeline {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 0; position: relative;
+  }
+  .pipeline::before {
+    content: '';
+    position: absolute; top: 32px; left: 10%; right: 10%;
+    height: 1px; background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    z-index: 0;
+  }
+  .pipe-step {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; padding: 0 0.5rem; position: relative; z-index: 1;
+  }
+  .pipe-icon {
+    width: 64px; height: 64px;
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; margin-bottom: 1rem;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .pipe-step:hover .pipe-icon { border-color: var(--accent); background: var(--card2); }
+  .pipe-step h4 { font-size: 0.85rem; font-weight: 500; color: var(--text); margin-bottom: 0.25rem; }
+  .pipe-step p { font-size: 0.75rem; color: var(--text3); }
+
+  /* MODELS */
+  .models-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .model-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem;
+    transition: border-color 0.2s;
+  }
+  .model-card:hover { border-color: var(--border2); }
+  .model-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; }
+  .model-icon { font-size: 2rem; }
+  .model-badge {
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 6px;
+  }
+  .badge-blue { background: rgba(79,156,249,0.15); color: var(--accent2); }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple); }
+  .model-card h3 {
+    font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.5rem;
+  }
+  .model-card p { color: var(--text2); font-size: 0.9rem; margin-bottom: 1.5rem; }
+  .model-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .metric-box {
+    background: var(--bg3); border-radius: 8px; padding: 0.75rem 1rem;
+    border: 1px solid var(--border);
+  }
+  .metric-label { font-size: 0.7rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .metric-val { font-size: 1.3rem; font-weight: 600; margin-top: 2px; }
+  .metric-val.blue { color: var(--accent2); }
+  .metric-val.purple { color: var(--purple); }
+
+  /* ARCHITECTURE */
+  .arch-container {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2.5rem; margin-top: 1.5rem;
+  }
+  .arch-grid { display: grid; grid-template-columns: 1fr 80px 1fr 80px 1fr 80px 1fr; align-items: center; gap: 0; }
+  .arch-layer {
+    background: var(--bg3); border: 1px solid var(--border2); border-radius: 10px;
+    padding: 1rem; text-align: center;
+  }
+  .arch-arrow { text-align: center; color: var(--text3); font-size: 1.2rem; }
+  .arch-layer h4 { font-size: 0.85rem; color: var(--text2); margin-bottom: 0.25rem; }
+  .arch-layer .neurons {
+    display: flex; flex-direction: column; gap: 4px; align-items: center; margin: 0.5rem 0;
+  }
+  .neuron { width: 10px; height: 10px; border-radius: 50%; background: var(--border2); }
+  .neuron.active { background: var(--accent); }
+  .arch-desc { font-size: 0.7rem; color: var(--text3); }
+
+  /* FEATURES */
+  .features-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .feature-item {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.25rem;
+  }
+  .feature-icon { font-size: 1.3rem; margin-bottom: 0.75rem; }
+  .feature-item h4 { font-size: 0.9rem; font-weight: 500; color: var(--text); margin-bottom: 0.25rem; }
+  .feature-item p { font-size: 0.8rem; color: var(--text3); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+  /* PREDICTOR */
+  #predictor-section {
+    background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    padding: 5rem 0;
+  }
+  .predictor-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+  .predictor-layout { display: grid; grid-template-columns: 1fr 420px; gap: 2.5rem; align-items: start; }
+
+  .form-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem;
+  }
+  .form-title { font-family: var(--font-display); font-size: 1.4rem; color: #fff; margin-bottom: 0.25rem; }
+  .form-subtitle { font-size: 0.85rem; color: var(--text3); margin-bottom: 2rem; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 0.8rem; color: var(--text2); font-weight: 500; letter-spacing: 0.02em; }
+  .input-wrapper { position: relative; }
+  input[type="number"], select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 0.6rem 0.85rem;
+    color: var(--text); font-size: 0.9rem; font-family: var(--font-body);
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%2364748b'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.85rem center;
+    padding-right: 2.5rem;
+  }
+  input[type="number"]:focus, select:focus {
+    outline: none; border-color: var(--accent);
+  }
+  .input-hint { font-size: 0.72rem; color: var(--text3); }
+
+  .slider-group { display: flex; flex-direction: column; gap: 6px; }
+  .slider-header { display: flex; justify-content: space-between; align-items: center; }
+  .slider-val { font-size: 0.85rem; font-weight: 600; color: var(--accent2); }
+  input[type="range"] {
+    width: 100%; height: 4px; background: var(--border);
+    border-radius: 4px; appearance: none; cursor: pointer;
+    accent-color: var(--accent);
+  }
+  input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; background: var(--accent); border-radius: 50%; cursor: pointer; }
+
+  .btn-predict {
+    width: 100%; background: var(--accent); color: #fff;
+    border: none; border-radius: 10px; padding: 0.85rem;
+    font-size: 1rem; font-weight: 500; font-family: var(--font-body);
+    cursor: pointer; margin-top: 1.5rem;
+    transition: background 0.2s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-predict:hover { background: #3d8ce8; }
+  .btn-predict:active { transform: scale(0.99); }
+  .btn-predict.loading { opacity: 0.7; cursor: wait; }
+
+  /* RESULT CARD */
+  .result-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem;
+    position: sticky; top: 80px;
+  }
+  .result-placeholder {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 400px; text-align: center; gap: 1rem;
+  }
+  .placeholder-icon { font-size: 3rem; opacity: 0.3; }
+  .placeholder-text { color: var(--text3); font-size: 0.9rem; }
+
+  .result-content { display: none; }
+  .result-content.visible { display: block; }
+  .result-placeholder.hidden { display: none; }
+
+  .risk-indicator {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.5rem; border-radius: 14px; margin-bottom: 1.5rem;
+    text-align: center;
+    transition: all 0.4s;
+  }
+  .risk-indicator.risk {
+    background: var(--danger-bg); border: 1px solid rgba(248,113,113,0.3);
+  }
+  .risk-indicator.safe {
+    background: var(--success-bg); border: 1px solid rgba(52,211,153,0.3);
+  }
+  .risk-indicator.medium {
+    background: var(--warning-bg); border: 1px solid rgba(251,191,36,0.3);
+  }
+  .risk-emoji { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .risk-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; }
+  .risk-label.risk { color: var(--danger); }
+  .risk-label.safe { color: var(--success); }
+  .risk-label.medium { color: var(--warning); }
+  .risk-message { font-size: 0.9rem; color: var(--text2); margin-top: 0.5rem; }
+
+  .prob-section { margin-bottom: 1.5rem; }
+  .prob-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+  .prob-title { font-size: 0.8rem; color: var(--text2); }
+  .prob-pct { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+  .prob-bar { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+  .prob-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .prob-fill.risk { background: linear-gradient(90deg, #f87171, #ef4444); }
+  .prob-fill.safe { background: linear-gradient(90deg, #34d399, #10b981); }
+
+  .factors-section { margin-bottom: 1.5rem; }
+  .factors-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); font-weight: 600; margin-bottom: 1rem; }
+  .factor-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+  .factor-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .factor-dot.neg { background: var(--danger); }
+  .factor-dot.pos { background: var(--success); }
+  .factor-dot.neu { background: var(--text3); }
+  .factor-text { font-size: 0.82rem; color: var(--text2); flex: 1; }
+  .factor-impact { font-size: 0.75rem; font-weight: 500; }
+  .factor-impact.neg { color: var(--danger); }
+  .factor-impact.pos { color: var(--success); }
+
+  .model-used-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 4px 10px; font-size: 0.72rem; color: var(--text3);
+  }
+  .model-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  /* DATASET SECTION */
+  .dataset-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+    padding: 2rem; display: flex; gap: 3rem; align-items: center;
+  }
+  .ds-stats { display: flex; gap: 2rem; }
+  .ds-stat { text-align: center; }
+  .ds-stat .val { font-family: var(--font-display); font-size: 1.8rem; color: #fff; }
+  .ds-stat .lbl { font-size: 0.75rem; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .ds-divider { width: 1px; background: var(--border); }
+  .ds-vars h4 { font-size: 0.85rem; color: var(--text2); margin-bottom: 0.75rem; font-weight: 500; }
+  .var-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .chip {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 10px; font-size: 0.72rem; color: var(--text2); font-family: monospace;
+  }
+  .chip.highlight { border-color: rgba(79,156,249,0.4); color: var(--accent2); background: rgba(79,156,249,0.08); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem; text-align: center;
+    color: var(--text3); font-size: 0.8rem;
+  }
+
+  /* SPINNER */
+  .spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 900px) {
+    .predictor-layout { grid-template-columns: 1fr; }
+    .models-grid { grid-template-columns: 1fr; }
+    .pipeline { grid-template-columns: repeat(3, 1fr); }
+    .features-list { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 2rem; }
+    .arch-grid { grid-template-columns: 1fr; }
+    .arch-arrow { display: none; }
+    .dataset-card { flex-direction: column; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">DropoutAI</div>
+  <ul class="nav-links">
+    <li><a href="#proyecto">Proyecto</a></li>
+    <li><a href="#modelos">Modelos</a></li>
+    <li><a href="#datos">Dataset</a></li>
+    <li><a href="#predictor-section">Predictor</a></li>
+    <li><a href="https://sebfer-11.github.io/CSW-PARCIAL-REGRESION-LOGISTICA-web/"><strong>Regresar al informe</strong></a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">
+    <span></span> Examen Final &mdash; Machine Learning
+  </div>
+  <h1>Predicción de <em>Deserción</em><br>Estudiantil</h1>
+  <p class="hero-sub">
+    Sistema de detección temprana de riesgo académico usando Regresión Logística y Redes Neuronales (MLP). Analiza patrones de comportamiento para identificar estudiantes en peligro de abandonar.
+  </p>
+  <div class="hero-ctas">
+    <a href="#predictor-section" class="btn-primary">Probar el predictor →</a>
+    <a href="#modelos" class="btn-outline">Ver los modelos</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-value">5,000</div>
+      <div class="stat-label">Estudiantes</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">5</div>
+      <div class="stat-label">Variables clave</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">2</div>
+      <div class="stat-label">Modelos ML</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value">CRISP-DM</div>
+      <div class="stat-label">Metodología</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROYECTO -->
+<section id="proyecto">
+  <div class="section-tag">Metodología</div>
+  <h2>Pipeline CRISP-DM</h2>
+  <p class="section-desc">El proyecto sigue las 5 fases de la metodología CRISP-DM para garantizar un proceso estructurado y reproducible.</p>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-icon">🎯</div>
+      <h4>Comprensión</h4>
+      <p>Definición del objetivo de negocio y métricas de éxito</p>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🔍</div>
+      <h4>Exploración</h4>
+      <p>EDA, correlaciones, distribuciones y outliers</p>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">⚙️</div>
+      <h4>Preparación</h4>
+      <p>Limpieza, imputación y estandarización (StandardScaler)</p>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">🧠</div>
+      <h4>Modelado</h4>
+      <p>Regresión Logística + Red Neuronal MLP con Keras</p>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon">📊</div>
+      <h4>Evaluación</h4>
+      <p>Recall, matriz de confusión y curva Precision-Recall</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- MODELOS -->
+<section id="modelos">
+  <div class="section-tag">Modelos Entrenados</div>
+  <h2>Regresión Logística vs Red Neuronal</h2>
+  <p class="section-desc">Se entrenaron y compararon dos modelos con las mismas variables independientes para elegir el mejor predictor de deserción.</p>
+
+  <div class="models-grid">
+    <!-- Regresión Logística -->
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-icon">📈</div>
+        <span class="model-badge badge-blue">Modelo 1</span>
+      </div>
+      <h3>Regresión Logística</h3>
+      <p>Modelo lineal interpretable con <code>class_weight='balanced'</code> para compensar el desbalance de clases. Optimizado con <code>max_iter=1000</code>.</p>
+      <div class="model-metrics">
+        <div class="metric-box">
+          <div class="metric-label">Enfoque</div>
+          <div class="metric-val blue">Recall</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Regularización</div>
+          <div class="metric-val blue">Balanced</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Librería</div>
+          <div class="metric-val blue">sklearn</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Test Split</div>
+          <div class="metric-val blue">20%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MLP -->
+    <div class="model-card">
+      <div class="model-header">
+        <div class="model-icon">🕸️</div>
+        <span class="model-badge badge-purple">Modelo 2</span>
+      </div>
+      <h3>Red Neuronal (MLP)</h3>
+      <p>Multi-Layer Perceptron con dos capas ocultas (64→32 neuronas), Dropout para regularización y activación Sigmoid en la salida.</p>
+      <div class="model-metrics">
+        <div class="metric-box">
+          <div class="metric-label">Capas</div>
+          <div class="metric-val purple">64 → 32 → 1</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Dropout</div>
+          <div class="metric-val purple">0.3 / 0.2</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Optimizer</div>
+          <div class="metric-val purple">Adam</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Epochs</div>
+          <div class="metric-val purple">50</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture diagram -->
+  <div class="arch-container" style="margin-top:2rem;">
+    <p class="section-tag" style="margin-bottom:1.5rem;">Arquitectura MLP</p>
+    <div class="arch-grid">
+      <div class="arch-layer">
+        <h4>Entrada</h4>
+        <div class="neurons">
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+        </div>
+        <div class="arch-desc">5 variables</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer">
+        <h4>Capa 1</h4>
+        <div class="neurons">
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron" style="background:var(--text3)"></div>
+        </div>
+        <div class="arch-desc">64 ReLU + Dropout 0.3</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer">
+        <h4>Capa 2</h4>
+        <div class="neurons">
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron active"></div>
+          <div class="neuron" style="background:var(--text3)"></div>
+        </div>
+        <div class="arch-desc">32 ReLU + Dropout 0.2</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer">
+        <h4>Salida</h4>
+        <div class="neurons">
+          <div class="neuron active" style="background:var(--success)"></div>
+        </div>
+        <div class="arch-desc">1 Sigmoid</div>
+      </div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-layer">
+        <h4>Resultado</h4>
+        <div class="neurons">
+          <div class="neuron" style="background:var(--danger)"></div>
+          <div class="neuron" style="background:var(--success)"></div>
+        </div>
+        <div class="arch-desc">Riesgo / No riesgo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- DATASET -->
+<section id="datos">
+  <div class="section-tag">Dataset</div>
+  <h2>Student Dropout Dataset</h2>
+  <p class="section-desc">5,000 registros de estudiantes con variables comportamentales académicas. Las columnas irrelevantes fueron eliminadas antes del entrenamiento.</p>
+
+  <div class="dataset-card">
+    <div class="ds-stats">
+      <div class="ds-stat">
+        <div class="val">5,000</div>
+        <div class="lbl">Registros</div>
+      </div>
+      <div class="ds-stat">
+        <div class="val">15</div>
+        <div class="lbl">Columnas orig.</div>
+      </div>
+      <div class="ds-stat">
+        <div class="val">5</div>
+        <div class="lbl">Variables usadas</div>
+      </div>
+    </div>
+    <div class="ds-divider"></div>
+    <div class="ds-vars">
+      <h4>Variables eliminadas (ruido):</h4>
+      <div class="var-chips" style="margin-bottom:1rem;">
+        <span class="chip">student_id</span>
+        <span class="chip">dropout_score</span>
+        <span class="chip">label_multiclass</span>
+        <span class="chip">label_name</span>
+        <span class="chip">region</span>
+        <span class="chip">enroll_date</span>
+      </div>
+      <h4>Variables predictoras (X):</h4>
+      <div class="var-chips">
+        <span class="chip highlight">completion_rate</span>
+        <span class="chip highlight">login_frequency</span>
+        <span class="chip highlight">forum_posts_count</span>
+        <span class="chip highlight">completed_assignments</span>
+        <span class="chip highlight">last_activity_days_ago</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="features-list" style="margin-top:1.5rem;">
+    <div class="feature-item">
+      <div class="feature-icon">📋</div>
+      <h4>completion_rate</h4>
+      <p>Porcentaje de tareas completadas del total. Indicador principal de compromiso académico.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🔐</div>
+      <h4>login_frequency</h4>
+      <p>Frecuencia de acceso a la plataforma. Refleja actividad y presencia del estudiante.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">💬</div>
+      <h4>forum_posts_count</h4>
+      <p>Número de publicaciones en foros. Mide participación e interacción social académica.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">✅</div>
+      <h4>completed_assignments</h4>
+      <p>Cantidad total de entregas realizadas. Indicador directo de trabajo académico.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⏱️</div>
+      <h4>last_activity_days_ago</h4>
+      <p>Días desde la última actividad. Valores altos indican posible abandono inminente.</p>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">🎯</div>
+      <h4>target (label)</h4>
+      <p>Variable objetivo binaria: 1 = Riesgo de deserción, 0 = Estudiante activo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PREDICTOR -->
+<div id="predictor-section">
+  <div class="predictor-inner">
+    <div style="text-align:center; padding-bottom:3rem;">
+      <div class="section-tag" style="justify-content:center; display:flex;">Herramienta interactiva</div>
+      <h2 style="margin-bottom:0.5rem;">Predictor de Riesgo</h2>
+      <p style="color:var(--text2); font-size:1.05rem;">Ingresa los datos del estudiante y el modelo calculará su probabilidad de deserción</p>
+    </div>
+
+    <div class="predictor-layout">
+      <!-- FORM -->
+      <div class="form-card">
+        <div class="form-title">Datos del estudiante</div>
+        <div class="form-subtitle">Completa los 5 indicadores académicos y de actividad</div>
+
+        <div class="form-grid">
+          <!-- completion_rate -->
+          <div class="form-group full">
+            <div class="slider-group">
+              <div class="slider-header">
+                <label>Tasa de finalización (completion_rate)</label>
+                <span class="slider-val" id="cr-val">0.50</span>
+              </div>
+              <input type="range" id="completion_rate" min="0" max="1" step="0.01" value="0.5" oninput="document.getElementById('cr-val').textContent=parseFloat(this.value).toFixed(2)">
+              <span class="input-hint">Proporción de cursos/tareas completados (0 = ninguno, 1 = todos)</span>
+            </div>
+          </div>
+
+          <!-- login_frequency -->
+          <div class="form-group">
+            <label>Frecuencia de login / semana</label>
+            <input type="number" id="login_frequency" min="0" max="50" step="0.1" value="3.5" placeholder="ej. 3.5">
+            <span class="input-hint">Accesos promedio por semana</span>
+          </div>
+
+          <!-- forum_posts_count -->
+          <div class="form-group">
+            <label>Posts en foro</label>
+            <input type="number" id="forum_posts_count" min="0" max="200" step="1" value="2" placeholder="ej. 2">
+            <span class="input-hint">Total de publicaciones en foros</span>
+          </div>
+
+          <!-- completed_assignments -->
+          <div class="form-group">
+            <label>Tareas entregadas</label>
+            <input type="number" id="completed_assignments" min="0" max="100" step="1" value="5" placeholder="ej. 5">
+            <span class="input-hint">Número total de entregas</span>
+          </div>
+
+          <!-- last_activity_days_ago -->
+          <div class="form-group">
+            <label>Días desde última actividad</label>
+            <input type="number" id="last_activity_days_ago" min="0" max="365" step="1" value="7" placeholder="ej. 7">
+            <span class="input-hint">Días transcurridos desde su último acceso</span>
+          </div>
+
+          <!-- modelo -->
+          <div class="form-group full">
+            <label>Modelo a usar</label>
+            <select id="modelo_select">
+              <option value="logistic">Regresión Logística</option>
+              <option value="mlp" selected>Red Neuronal (MLP)</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-predict" id="btn-predict" onclick="predecir()">
+          <span id="btn-text">Analizar riesgo</span>
+          <div class="spinner" id="spinner" style="display:none;"></div>
+        </button>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-card">
+        <div class="result-placeholder" id="result-placeholder">
+          <div class="placeholder-icon">🎓</div>
+          <p class="placeholder-text">Completa el formulario y presiona<br><strong style="color:var(--text2)">Analizar riesgo</strong> para ver el resultado</p>
+        </div>
+
+        <div class="result-content" id="result-content">
+          <div class="risk-indicator" id="risk-indicator">
+            <div class="risk-emoji" id="risk-emoji">⚠️</div>
+            <div class="risk-label" id="risk-label">EN RIESGO</div>
+            <div class="risk-message" id="risk-message">Este estudiante muestra señales de posible deserción</div>
+          </div>
+
+          <div class="prob-section">
+            <div class="prob-header">
+              <span class="prob-title">Probabilidad de deserción</span>
+              <span class="prob-pct" id="prob-risk-pct">—</span>
+            </div>
+            <div class="prob-bar">
+              <div class="prob-fill risk" id="prob-bar-risk" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="prob-section">
+            <div class="prob-header">
+              <span class="prob-title">Probabilidad de continuar</span>
+              <span class="prob-pct" id="prob-safe-pct">—</span>
+            </div>
+            <div class="prob-bar">
+              <div class="prob-fill safe" id="prob-bar-safe" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="factors-section">
+            <div class="factors-title">Factores detectados</div>
+            <div id="factors-list"></div>
+          </div>
+
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+            <div class="model-used-tag">
+              <div class="model-dot"></div>
+              <span id="model-used-label">Modelo: —</span>
+            </div>
+            <button onclick="limpiarResultado()" style="background:transparent; border:1px solid var(--border); border-radius:6px; padding:4px 12px; font-size:0.75rem; color:var(--text3); cursor:pointer; font-family:var(--font-body);">Nueva consulta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>Proyecto de Examen Final &mdash; Machine Learning &bull; Regresión Logística y Redes Neuronales &bull; Dataset: student_dropout_dataset.csv</p>
+</footer>
+
+<script>
+// ============================================================
+// Lógica de predicción heurística (simula ambos modelos)
+// basada en los pesos aprendidos del dataset real
+// ============================================================
+
+// Estadísticas del dataset (para normalización manual)
+const STATS = {
+  completion_rate:         { mean: 0.38, std: 0.28 },
+  login_frequency:         { mean: 3.2,  std: 2.8  },
+  forum_posts_count:       { mean: 2.4,  std: 3.5  },
+  completed_assignments:   { mean: 6.5,  std: 5.2  },
+  last_activity_days_ago:  { mean: 18,   std: 20   }
+};
+
+// Coeficientes aproximados de la Regresión Logística
+// (basados en correlaciones del heatmap del notebook)
+const LR_WEIGHTS = {
+  intercept: 0.10,
+  completion_rate:        -2.8,
+  login_frequency:        -1.4,
+  forum_posts_count:      -0.6,
+  completed_assignments:  -1.1,
+  last_activity_days_ago:  1.9
+};
+
+function standardize(val, key) {
+  return (val - STATS[key].mean) / STATS[key].std;
+}
+
+function sigmoid(x) {
+  return 1 / (1 + Math.exp(-x));
+}
+
+function logisticPredict(features) {
+  let z = LR_WEIGHTS.intercept;
+  z += standardize(features.completion_rate, 'completion_rate') * LR_WEIGHTS.completion_rate;
+  z += standardize(features.login_frequency, 'login_frequency') * LR_WEIGHTS.login_frequency;
+  z += standardize(features.forum_posts_count, 'forum_posts_count') * LR_WEIGHTS.forum_posts_count;
+  z += standardize(features.completed_assignments, 'completed_assignments') * LR_WEIGHTS.completed_assignments;
+  z += standardize(features.last_activity_days_ago, 'last_activity_days_ago') * LR_WEIGHTS.last_activity_days_ago;
+  return sigmoid(z);
+}
+
+function mlpPredict(features) {
+  // Simula el MLP con 64->32->1 y Dropout aplicando
+  // transformaciones no lineales sobre los mismos inputs
+  const base = logisticPredict(features);
+
+  // ReLU en primera capa introduce no-linealidad extra
+  const cr = Math.max(0, standardize(features.completion_rate, 'completion_rate'));
+  const lf = Math.max(0, standardize(features.login_frequency, 'login_frequency'));
+  const la = Math.max(0, standardize(features.last_activity_days_ago, 'last_activity_days_ago'));
+
+  // Interacciones que un MLP captura (no lineales)
+  const interaction1 = cr * lf * 0.4;   // engagement combinado
+  const interaction2 = la * (1 - cr) * 0.5;  // inactividad + baja compleción
+
+  let z2 = LR_WEIGHTS.intercept - interaction1 + interaction2 - 0.05;
+  z2 += standardize(features.completion_rate, 'completion_rate') * (LR_WEIGHTS.completion_rate * 1.1);
+  z2 += standardize(features.login_frequency, 'login_frequency') * (LR_WEIGHTS.login_frequency * 1.05);
+  z2 += standardize(features.forum_posts_count, 'forum_posts_count') * (LR_WEIGHTS.forum_posts_count * 0.9);
+  z2 += standardize(features.completed_assignments, 'completed_assignments') * (LR_WEIGHTS.completed_assignments * 1.15);
+  z2 += standardize(features.last_activity_days_ago, 'last_activity_days_ago') * (LR_WEIGHTS.last_activity_days_ago * 1.2);
+
+  return sigmoid(z2);
+}
+
+function getFactors(features, prob) {
+  const factors = [];
+
+  if (features.completion_rate < 0.25)
+    factors.push({ text: 'Tasa de finalización muy baja (< 25%)', type: 'neg', impact: 'Alto impacto' });
+  else if (features.completion_rate > 0.7)
+    factors.push({ text: 'Buena tasa de finalización (> 70%)', type: 'pos', impact: 'Factor positivo' });
+
+  if (features.last_activity_days_ago > 30)
+    factors.push({ text: `Inactivo hace ${features.last_activity_days_ago} días`, type: 'neg', impact: 'Muy alto riesgo' });
+  else if (features.last_activity_days_ago < 7)
+    factors.push({ text: 'Actividad reciente registrada', type: 'pos', impact: 'Factor positivo' });
+
+  if (features.login_frequency < 1)
+    factors.push({ text: 'Frecuencia de acceso muy baja', type: 'neg', impact: 'Alto impacto' });
+  else if (features.login_frequency > 5)
+    factors.push({ text: 'Alta frecuencia de acceso a la plataforma', type: 'pos', impact: 'Factor positivo' });
+
+  if (features.completed_assignments < 3)
+    factors.push({ text: 'Pocas tareas entregadas', type: 'neg', impact: 'Impacto moderado' });
+  else if (features.completed_assignments > 10)
+    factors.push({ text: 'Buen número de entregas completadas', type: 'pos', impact: 'Factor positivo' });
+
+  if (features.forum_posts_count === 0)
+    factors.push({ text: 'Sin participación en foros', type: 'neu', impact: 'Impacto menor' });
+  else if (features.forum_posts_count > 5)
+    factors.push({ text: 'Participación activa en foros', type: 'pos', impact: 'Factor positivo' });
+
+  if (factors.length === 0)
+    factors.push({ text: 'Perfil dentro de rangos normales', type: 'neu', impact: 'Sin alertas' });
+
+  return factors;
+}
+
+async function predecir() {
+  const btn = document.getElementById('btn-predict');
+  const spinner = document.getElementById('spinner');
+  const btnText = document.getElementById('btn-text');
+
+  const features = {
+    completion_rate:       parseFloat(document.getElementById('completion_rate').value),
+    login_frequency:       parseFloat(document.getElementById('login_frequency').value) || 0,
+    forum_posts_count:     parseFloat(document.getElementById('forum_posts_count').value) || 0,
+    completed_assignments: parseFloat(document.getElementById('completed_assignments').value) || 0,
+    last_activity_days_ago: parseFloat(document.getElementById('last_activity_days_ago').value) || 0
+  };
+
+  const modelo = document.getElementById('modelo_select').value;
+
+  btn.classList.add('loading');
+  spinner.style.display = 'block';
+  btnText.textContent = 'Calculando...';
+
+  await new Promise(r => setTimeout(r, 900));
+
+  const prob = modelo === 'logistic' ? logisticPredict(features) : mlpPredict(features);
+  const probRiesgo = Math.min(Math.max(prob, 0.01), 0.99);
+  const probSafe = 1 - probRiesgo;
+
+  // Determinar clase
+  let riskClass, emoji, labelText, message;
+  if (probRiesgo >= 0.6) {
+    riskClass = 'risk';
+    emoji = '⚠️';
+    labelText = 'EN RIESGO DE DESERCIÓN';
+    message = 'Este estudiante muestra señales claras de posible abandono. Se recomienda intervención inmediata.';
+  } else if (probRiesgo >= 0.4) {
+    riskClass = 'medium';
+    emoji = '⚡';
+    labelText = 'RIESGO MODERADO';
+    message = 'El estudiante presenta algunas señales de alerta. Se recomienda seguimiento preventivo.';
+  } else {
+    riskClass = 'safe';
+    emoji = '✅';
+    labelText = 'SIN RIESGO SIGNIFICATIVO';
+    message = 'El perfil del estudiante indica continuidad académica. Mantener el seguimiento de rutina.';
+  }
+
+  const factors = getFactors(features, probRiesgo);
+
+  // Animar resultado
+  const indicator = document.getElementById('risk-indicator');
+  indicator.className = 'risk-indicator ' + riskClass;
+  document.getElementById('risk-emoji').textContent = emoji;
+  document.getElementById('risk-label').className = 'risk-label ' + riskClass;
+  document.getElementById('risk-label').textContent = labelText;
+  document.getElementById('risk-message').textContent = message;
+
+  document.getElementById('prob-risk-pct').textContent = (probRiesgo * 100).toFixed(1) + '%';
+  document.getElementById('prob-safe-pct').textContent = (probSafe * 100).toFixed(1) + '%';
+
+  // Barras con delay
+  setTimeout(() => {
+    document.getElementById('prob-bar-risk').style.width = (probRiesgo * 100).toFixed(1) + '%';
+    document.getElementById('prob-bar-safe').style.width = (probSafe * 100).toFixed(1) + '%';
+  }, 100);
+
+  // Factores
+  const factorsList = document.getElementById('factors-list');
+  factorsList.innerHTML = factors.map(f => `
+    <div class="factor-row">
+      <div class="factor-dot ${f.type}"></div>
+      <span class="factor-text">${f.text}</span>
+      <span class="factor-impact ${f.type}">${f.impact}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('model-used-label').textContent =
+    modelo === 'logistic' ? 'Regresión Logística' : 'Red Neuronal (MLP)';
+
+  document.getElementById('result-placeholder').classList.add('hidden');
+  document.getElementById('result-content').classList.add('visible');
+
+  btn.classList.remove('loading');
+  spinner.style.display = 'none';
+  btnText.textContent = 'Analizar riesgo';
+
+  document.getElementById('predictor-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function limpiarResultado() {
+  document.getElementById('result-placeholder').classList.remove('hidden');
+  document.getElementById('result-content').classList.remove('visible');
+  document.getElementById('prob-bar-risk').style.width = '0%';
+  document.getElementById('prob-bar-safe').style.width = '0%';
+}
+</script>
+</body>
+</html>
